@@ -1,0 +1,16 @@
+.chat-item-wrapper {
+  font-size: 16px;
+  display: flex;
+  gap: 0.3em;
+  margin-top: 1em;
+
+  .avatar {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .title {
+    font-weight: 700;
+  }
+}

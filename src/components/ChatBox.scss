@@ -9,5 +9,16 @@
     background-color: unset;
     border: unset;
     cursor: pointer;
+
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: #676767;
+    svg {
+      color: white;
+    }
   }
 }

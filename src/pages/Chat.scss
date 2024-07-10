@@ -2,18 +2,35 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  .chat-history {
-    flex-grow: 1;
+  min-width: 500px;
+
+  .chat-page {
     overflow: auto;
+    flex-grow: 1;
+    align-self: stretch;
 
-    width: 70%;
-    min-width: 500px;
+    .empty-text {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-header {
+      position: sticky;
+      top: 0;
+    }
+    .chat-content {
+      display: flex;
+      justify-content: center;
 
-    padding: 20px;
+      .chat-content-inner {
+        width: 70%;
+      }
+    }
   }
 
   .chat-box-wrapper {
+    align-self: center;
     flex-shrink: 0;
     align-self: stretch;
   }

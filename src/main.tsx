@@ -2,7 +2,7 @@ import "./index.css"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import ApiInput from "./pages/ApiInput.tsx"
+import ApiInput from "./pages/Start.tsx"
 import Chat from "./pages/Chat.tsx"
 
 const router = createBrowserRouter([

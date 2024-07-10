@@ -1,9 +1,9 @@
-import "./ApiInput.scss"
+import "./Start.scss"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import ConfigurableButton from "../components/ConfigurableButton"
 import ConfigurableInput from "../components/ConfigurableInput"
 import { isValidApiKey } from "../utils"
-import { useNavigate } from "react-router-dom"
 
 export default function ApiInput() {
   const [apiKey, setApiKey] = useState<string>(
