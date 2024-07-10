@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom"
 import ConfigurableButton from "../components/ConfigurableButton"
 import ConfigurableInput from "../components/ConfigurableInput"
 import { isValidApiKey } from "../utils"
+import { localStorageApiKey } from "../constants"
 
 export default function ApiInput() {
   const [apiKey, setApiKey] = useState<string>(
-    // TODO reset this to empty string later
+    // only for test purpose
     import.meta.env.VITE_OPENROUTER_API_KEY
   )
   const navigate = useNavigate()
@@ -15,12 +16,17 @@ export default function ApiInput() {
   const [isPending, setIsPending] = useState(false)
   const [hasErred, setHasErred] = useState(false)
   const handleSubmit = async () => {
+    // clean up
     setIsPending(true)
     setHasErred(false)
-    if (await isValidApiKey({ apiKey: apiKey! })) {
-      navigate("/")
+
+    // validate api key
+    if (await isValidApiKey({ apiKey })) {
+      localStorage.setItem(localStorageApiKey, apiKey)
+      navigate("/chat")
       setIsPending(false)
     } else {
+      localStorage.removeItem(localStorageApiKey)
       setHasErred(true)
     }
   }

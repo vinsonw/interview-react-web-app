@@ -5,8 +5,13 @@ import { getResponseFromBot, ResponseMessage } from "../utils"
 import ChatBox, { ChatBoxStatus } from "../components/ChatBox"
 import ChatItem, { BotPendingItem } from "../components/ChatItem"
 import ChatHeader from "../components/ChatHeader"
+import { useRedirectWhenApiKeyIsInValid } from "../hooks/use-redirect-when-api-key-is-invalid"
 
 export default function Chat() {
+  // check if api key is valid on mount
+  useRedirectWhenApiKeyIsInValid()
+
+  // handle user / bot interactions
   const [chatHistory, setChatHistory] = useState<ResponseMessage[]>([])
   const [chatBoxStatus, setChatBoxStatus] = useState<ChatBoxStatus>("idle")
   const handleUserInput = async (content: string) => {

@@ -1,3 +1,5 @@
+import { localStorageApiKey } from "../constants"
+
 type RequestToBot = {
   role?: string
   content: string
@@ -21,8 +23,8 @@ type ResponseFromBot = {
 
 export const getResponseFromBot = async ({
   content,
+  apiKey = localStorage.getItem(localStorageApiKey)!,
   chatHistory = [{ role: "user", content }],
-  apiKey = import.meta.env.VITE_OPENROUTER_API_KEY,
 }: RequestToBot): Promise<ResponseFromBot | null> => {
   if (!content) return null
 
@@ -42,8 +44,12 @@ export const getResponseFromBot = async ({
           messages: chatHistory,
         }),
       }
-    ).then((res) => res.json())
-
+    ).then((res) => {
+      if (res.status !== 200) {
+        throw new Error("Unauthorized")
+      }
+      return res.json()
+    })
     return res
   } catch (e) {
     throw e
@@ -53,6 +59,8 @@ export const getResponseFromBot = async ({
 export const isValidApiKey = async ({ apiKey }: { apiKey: string }) => {
   try {
     await getResponseFromBot({
+      // the content does not matter as long as
+      // the bot returns something
       content: "hello",
       apiKey,
     })
