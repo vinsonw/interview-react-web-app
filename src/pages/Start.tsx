@@ -9,7 +9,7 @@ import { localStorageApiKey } from "../constants"
 export default function ApiInput() {
   const [apiKey, setApiKey] = useState<string>(
     // only for test purpose
-    import.meta.env.VITE_OPENROUTER_API_KEY
+    import.meta.env.VITE_OPENROUTER_API_KEY || ""
   )
   const navigate = useNavigate()
 
