@@ -2,17 +2,21 @@ import "./index.css"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import Start from "./pages/Start.tsx"
-import Chat from "./pages/Chat.tsx"
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Start />,
+    lazy: async () => {
+      const { Start } = await import("./pages/Start.tsx")
+      return { Component: Start }
+    },
   },
   {
     path: "/chat",
-    element: <Chat />,
+    lazy: async () => {
+      const { Chat } = await import("./pages/Chat.tsx")
+      return { Component: Chat }
+    },
   },
 ])
 

@@ -6,7 +6,7 @@ import ConfigurableInput from "../components/ConfigurableInput"
 import { isValidApiKey } from "../utils"
 import { localStorageApiKey } from "../constants"
 
-export default function ApiInput() {
+export function Start() {
   const [apiKey, setApiKey] = useState<string>(
     // only for test purpose
     import.meta.env.VITE_OPENROUTER_API_KEY || ""
@@ -24,10 +24,10 @@ export default function ApiInput() {
     if (await isValidApiKey({ apiKey })) {
       localStorage.setItem(localStorageApiKey, apiKey)
       navigate("/chat")
-      setIsPending(false)
     } else {
       localStorage.removeItem(localStorageApiKey)
       setHasErred(true)
+      setIsPending(false)
     }
   }
 
@@ -39,15 +39,13 @@ export default function ApiInput() {
             <ConfigurableInput
               placeholder="Input a api key to start."
               value={apiKey}
+              disabled={isPending}
               onChange={(e) => {
                 setApiKey(e.target.value)
+                setHasErred(false)
               }}
             />
           </div>
-          <div className="error">
-            {hasErred ? "invalid api key, try again" : null}
-          </div>
-
           <div className="button-wrapper">
             <ConfigurableButton
               disabled={!apiKey || isPending}
@@ -55,6 +53,9 @@ export default function ApiInput() {
             >
               {isPending ? "Checking key" : "Stat chatting"}
             </ConfigurableButton>
+          </div>
+          <div className="error">
+            {hasErred ? "invalid api key, try again" : null}
           </div>
         </div>
       </div>

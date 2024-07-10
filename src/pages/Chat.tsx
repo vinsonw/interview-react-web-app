@@ -7,7 +7,7 @@ import ChatItem, { BotPendingItem } from "../components/ChatItem"
 import ChatHeader from "../components/ChatHeader"
 import { useRedirectWhenApiKeyIsInValid } from "../hooks/use-redirect-when-api-key-is-invalid"
 
-export default function Chat() {
+export function Chat() {
   // check if api key is valid on mount
   useRedirectWhenApiKeyIsInValid()
 
