@@ -1,0 +1,20 @@
+.chat-page-wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .chat-history {
+    flex-grow: 1;
+    overflow: auto;
+
+    width: 70%;
+    min-width: 500px;
+
+    padding: 20px;
+  }
+
+  .chat-box-wrapper {
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+}

@@ -1,0 +1,13 @@
+.chat-box-wrapper {
+  position: relative;
+  padding: 20px;
+  button {
+    position: absolute;
+    right: 2em;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: unset;
+    border: unset;
+    cursor: pointer;
+  }
+}
