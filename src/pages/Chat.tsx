@@ -1,22 +1,27 @@
 import "./Chat.scss"
-
-import { useState } from "react"
-import { getResponseFromBot, ResponseMessage } from "../utils"
-import ChatBox, { ChatBoxStatus } from "../components/ChatBox"
+import { useEffect, useRef, useState } from "react"
+import { ResponseMessage } from "../utils"
+import {
+  useRedirectWhenApiKeyIsInValid,
+  useResponseStreamingText,
+} from "../hooks"
+import ChatBox from "../components/ChatBox"
 import ChatItem, { BotPendingItem } from "../components/ChatItem"
 import ChatHeader from "../components/ChatHeader"
-import { useRedirectWhenApiKeyIsInValid } from "../hooks/use-redirect-when-api-key-is-invalid"
 
 export function Chat() {
   // check if api key is valid on mount
   useRedirectWhenApiKeyIsInValid()
 
-  // handle user / bot interactions
   const [chatHistory, setChatHistory] = useState<ResponseMessage[]>([])
-  const [chatBoxStatus, setChatBoxStatus] = useState<ChatBoxStatus>("idle")
-  const handleUserInput = async (content: string) => {
-    setChatBoxStatus("pending")
+  const { isPending, isStreamingFinished, request, streamingResponseText } =
+    useResponseStreamingText()
+  const chatBoxElRef = useRef<HTMLDivElement | null>(null)
 
+  // waiting time = pending time + streaming time
+  const isWaitingForResponseToComplete = isPending || !isStreamingFinished
+
+  const handleUserInput = async (content: string) => {
     // update ui immediately
     const newChatHistory: ResponseMessage[] = [
       ...chatHistory,
@@ -24,15 +29,34 @@ export function Chat() {
     ]
     setChatHistory(newChatHistory)
 
-    // wait for response then update ui again
-    const res = await getResponseFromBot({
+    // request new response
+    request({
       content,
       chatHistory: newChatHistory,
     })
-    if (!res) return console.error("res is null")
-    setChatHistory(newChatHistory.concat(res.choices[0].message))
-    setChatBoxStatus("idle")
   }
+
+  // update context
+  useEffect(() => {
+    if (!isPending && isStreamingFinished && streamingResponseText) {
+      setChatHistory((history) =>
+        history.concat([{ role: "assistant", content: streamingResponseText }])
+      )
+    }
+  }, [isPending, isStreamingFinished, streamingResponseText])
+
+  // update position of streaming chat item
+  useEffect(() => {
+    let rafPending = 0
+    const update = () => {
+      if (chatBoxElRef.current && !isStreamingFinished) {
+        chatBoxElRef.current.scrollIntoView()
+      }
+      rafPending = requestAnimationFrame(update)
+    }
+    rafPending = requestAnimationFrame(update)
+    return () => window.cancelAnimationFrame(rafPending)
+  }, [isStreamingFinished])
 
   return (
     <div className="chat-page-wrapper">
@@ -57,11 +81,23 @@ export function Chat() {
                 }
               />
             ))}
-            {chatBoxStatus === "pending" ? <BotPendingItem /> : null}
+            {/* streaming chat item */}
+            {isWaitingForResponseToComplete ? (
+              <BotPendingItem
+                ref={chatBoxElRef}
+                text={streamingResponseText ? streamingResponseText : "..."}
+              />
+            ) : null}
           </div>
         </div>
       </div>
-      <ChatBox status={chatBoxStatus} onSubmit={handleUserInput} />
+      {/* chat box */}
+      <div className="chat-box-wrapper">
+        <ChatBox
+          status={isWaitingForResponseToComplete ? "pending" : "idle"}
+          onSubmit={handleUserInput}
+        />
+      </div>
     </div>
   )
 }

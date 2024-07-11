@@ -1,6 +1,6 @@
 import { localStorageApiKey } from "../constants"
 
-type RequestToBot = {
+export type RequestToBot = {
   role?: string
   content: string
   chatHistory?: ResponseMessage[]
@@ -12,24 +12,60 @@ export type ResponseMessage = {
   role: string
 }
 
-type ResponseFromBot = {
-  choices: { index: number; finish_reason: any; message: ResponseMessage }[]
-  created: number
-  id: string
-  model: string
-  object: string
-  usage: any
+// type ResponseFromBot = {
+//   choices: { index: number; finish_reason: any; message: ResponseMessage }[]
+//   created: number
+//   id: string
+//   model: string
+//   object: string
+//   usage: any
+// }
+
+// type StreamingResponseFromBot = {
+//   choices: { index: number; finish_reason: any; delta: ResponseMessage }[]
+//   created: number
+//   id: string
+//   model: string
+//   object: string
+//   usage: any
+// }
+
+const getReaderText = (str: string) => {
+  let matchStr = ""
+  try {
+    let result = str.match(/data:\s*({.*?})\s*\n/g) as string[]
+    if (!result) return ""
+    result.forEach((_) => {
+      const matchStrItem = _.match(/data:\s*({.*?})\s*\n/)![1]
+      const data = JSON.parse(matchStrItem)
+      matchStr += data.choices[0].delta.content || ""
+    })
+  } catch (e) {
+    console.log(e)
+  }
+  return matchStr
 }
 
-export const getResponseFromBot = async ({
+export const getStreamingResponseFromBot = async ({
   content,
   apiKey = localStorage.getItem(localStorageApiKey)!,
   chatHistory = [{ role: "user", content }],
-}: RequestToBot): Promise<ResponseFromBot | null> => {
-  if (!content) return null
-
+  setStreamingResponseText = () => {},
+  setIsPending = () => {},
+  setIsStreamingFinished = () => {},
+}: RequestToBot & {
+  setStreamingResponseText?: (cb: (prev: string) => string) => void
+  setIsPending?: (isPending: boolean) => void
+  setIsStreamingFinished?: (isPending: boolean) => void
+}) => {
   try {
-    const res: ResponseFromBot = await fetch(
+    if (!content) return
+    // clean up last response
+    setStreamingResponseText(() => "")
+    setIsPending(true)
+    setIsStreamingFinished(false)
+
+    const res: Response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
@@ -42,15 +78,32 @@ export const getResponseFromBot = async ({
         body: JSON.stringify({
           model: "mistralai/mistral-7b-instruct:free",
           messages: chatHistory,
+          // enable streaming response
+          stream: true,
         }),
       }
     ).then((res) => {
       if (res.status !== 200) {
         throw new Error("Unauthorized")
       }
-      return res.json()
+      return res
     })
-    return res
+
+    setIsPending(false)
+
+    const reader = res.body!.getReader()
+    const decoder = new TextDecoder("utf-8")
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        console.log("***********************done")
+        setIsStreamingFinished(true)
+        break
+      }
+      const decodedText = decoder.decode(value)
+      console.log("--streaming response")
+      setStreamingResponseText((str) => str + getReaderText(decodedText))
+    }
   } catch (e) {
     throw e
   }
@@ -58,7 +111,7 @@ export const getResponseFromBot = async ({
 
 export const isValidApiKey = async ({ apiKey }: { apiKey: string }) => {
   try {
-    await getResponseFromBot({
+    await getStreamingResponseFromBot({
       // the content does not matter as long as
       // the bot returns something
       content: "hello",

@@ -1,5 +1,5 @@
 import "./ChatItem.scss"
-import { useEffect, useRef } from "react"
+import { forwardRef, useEffect, useRef } from "react"
 import PermIdentityRoundedIcon from "@mui/icons-material/PermIdentityRounded"
 
 import TipsAndUpdatesRoundedIcon from "@mui/icons-material/TipsAndUpdatesRounded"
@@ -31,17 +31,18 @@ export default function ChatItem({
   )
 }
 
-export const BotPendingItem = () => {
-  const elRef = useRef<HTMLDivElement>(null)
-  return (
-    <div className="chat-item-wrapper" ref={elRef}>
-      <div className="avatar">
-        <TipsAndUpdatesRoundedIcon />
+export const BotPendingItem = forwardRef<HTMLDivElement, { text: string }>(
+  ({ text }, ref) => {
+    return (
+      <div className="chat-item-wrapper" ref={ref}>
+        <div className="avatar">
+          <TipsAndUpdatesRoundedIcon />
+        </div>
+        <div className="right">
+          <div className="title">{"ChatGPT"}</div>
+          <div className="content">{text}</div>
+        </div>
       </div>
-      <div className="right">
-        <div className="title">{"ChatGPT"}</div>
-        <div className="content">{"..."}</div>
-      </div>
-    </div>
-  )
-}
+    )
+  }
+)
