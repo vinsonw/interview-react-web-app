@@ -15,7 +15,7 @@ export default function ChatItem({
 }) {
   const elRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (shouldScrollIntoView) elRef.current?.scrollIntoView()
+    if (shouldScrollIntoView) elRef.current?.scrollIntoView(false)
   }, [])
   const isUser = title === "user"
   return (

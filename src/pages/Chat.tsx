@@ -50,7 +50,7 @@ export function Chat() {
     let rafPending = 0
     const update = () => {
       if (chatBoxElRef.current && !isStreamingFinished) {
-        chatBoxElRef.current.scrollIntoView()
+        chatBoxElRef.current.scrollIntoView(false)
       }
       rafPending = requestAnimationFrame(update)
     }
