@@ -16,7 +16,7 @@ export function Chat() {
   const [chatHistory, setChatHistory] = useState<ResponseMessage[]>([])
   const { isPending, isStreamingFinished, request, streamingResponseText } =
     useResponseStreamingText()
-  const chatBoxElRef = useRef<HTMLDivElement | null>(null)
+  const streamingBoxElRef = useRef<HTMLDivElement | null>(null)
 
   // waiting time = pending time + streaming time
   const isWaitingForResponseToComplete = isPending || !isStreamingFinished
@@ -49,8 +49,8 @@ export function Chat() {
   useEffect(() => {
     let rafPending = 0
     const update = () => {
-      if (chatBoxElRef.current && !isStreamingFinished) {
-        chatBoxElRef.current.scrollIntoView(false)
+      if (streamingBoxElRef.current && !isStreamingFinished) {
+        streamingBoxElRef.current.scrollIntoView(false)
       }
       rafPending = requestAnimationFrame(update)
     }
@@ -84,7 +84,7 @@ export function Chat() {
             {/* streaming chat item */}
             {isWaitingForResponseToComplete ? (
               <BotPendingItem
-                ref={chatBoxElRef}
+                ref={streamingBoxElRef}
                 text={streamingResponseText ? streamingResponseText : "..."}
               />
             ) : null}
