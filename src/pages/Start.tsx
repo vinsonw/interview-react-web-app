@@ -51,7 +51,7 @@ export function Start() {
               disabled={!apiKey || isPending}
               onClick={handleSubmit}
             >
-              {isPending ? "Checking key" : "Stat chatting"}
+              {isPending ? "Checking key" : "Start chatting"}
             </ConfigurableButton>
           </div>
           <div className="error">
